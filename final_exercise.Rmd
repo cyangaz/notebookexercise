@@ -1,6 +1,10 @@
 ---
 title: "RNA-Seq data analysis"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
+    toc: true
+    toc_float: true
 ---
 
 Introduction
@@ -63,7 +67,7 @@ head(data)
 ```
 Let's remove any genes which are unmeasured in all samples.
 
-```{r}
+```{r message=FALSE}
 data %>%
   group_by(Probe) %>%
   summarise(
@@ -112,7 +116,7 @@ Average per gene
 
 We want to know the mean expression per gene for each of the conditions.
 
-```{r}
+```{r message=FALSE}
 data %>%
   group_by(Probe, condition) %>%
   summarise(
