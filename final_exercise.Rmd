@@ -6,7 +6,7 @@ output: html_notebook
 Introduction
 ============
 
-We're going to compare the expression levels of all genes in two conditionsl, Ish and T47D.  We have 5 replicates for each condition.
+We're going to compare the expression levels of all genes in two conditions, Ish and T47D.  We have 5 replicates for each condition.
 
 
 Setup
@@ -14,8 +14,8 @@ Setup
 
 ```{r message=FALSE}
 library(tidyverse)
+library(ggrepel)
 ```
-
 
 Prepare the data
 ================
@@ -127,9 +127,71 @@ data %>%
 head(data.per.sample)
 ```
 
-
 Plotting and Analysis
 =====================
+
+```{r fig.height=7, fig.width=7}
+data.per.sample %>%
+  ggplot(aes(x=Ish, y=T47D)) +
+  geom_point(size=0.3)
+```
+
+Biggest Changes
+---------------
+
+```{r}
+data.per.sample %>%
+  mutate(diff=Ish-T47D) %>%
+  arrange(desc(abs(diff))) -> data.per.sample
+
+data.per.sample %>%
+  slice(1:50)
+```
+GAGE Genes
+----------
+
+We heard that these were regulated together, so let's look.
+
+```{r}
+data.per.sample %>%
+  filter(startsWith(Probe,"GAGE")) -> data.gage.genes
+
+data.gage.genes
+```
+Plotting with a GAGE column
+---------------------------
+
+```{r fig.height=7, fig.width=7}
+data.per.sample %>%
+  mutate(
+    IsGage = startsWith(Probe,"GAGE")
+  ) %>%
+  ggplot(aes(x=Ish,y=T47D,colour=IsGage)) +
+  geom_point(size=0.3, show.legend = FALSE) +
+  scale_colour_manual(values=c("grey","red2")) +
+  theme_bw()
+```
+
+
+Plotting with a data subset
+---------------------------
+
+```{r fig.height=7, fig.width=7}
+data.per.sample %>%
+  ggplot(aes(x=Ish,y=T47D, label=Probe)) +
+  geom_point(size=0.3, show.legend = FALSE, colour="grey") +
+  theme_bw() +
+  geom_point(
+    size=2, 
+    show.legend = FALSE, 
+    colour="red2", 
+    data=data.gage.genes
+  ) +
+  geom_text_repel(
+    data=data.gage.genes,
+    colour="black"
+  )
+```
 
 
 
