@@ -88,10 +88,45 @@ data %>%
   group_by(sample) %>%
   mutate(
     log2RPM = log2( (count+1) / (sum(count)/1000000) )
-  ) -> data
+  ) %>%
+  ungroup()-> data
 
 head(data)
 ```
+
+Normalisation check
+-------------------
+
+Let's check the distributions of all of the samples with a violin plot.
+
+```{r}
+data %>%
+  ggplot(aes(x=sample, y=log2RPM, fill=condition)) +
+  geom_violin() +
+  scale_fill_brewer(palette = "Set1")
+
+```
+
+Average per gene
+----------------
+
+We want to know the mean expression per gene for each of the conditions.
+
+```{r}
+data %>%
+  group_by(Probe, condition) %>%
+  summarise(
+    expression=mean(log2RPM)
+  ) %>%
+  ungroup() %>%
+  pivot_wider(
+    names_from=condition,
+    values_from=expression
+  ) -> data.per.sample
+
+head(data.per.sample)
+```
+
 
 Plotting and Analysis
 =====================
