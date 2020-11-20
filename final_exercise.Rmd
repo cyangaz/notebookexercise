@@ -81,6 +81,22 @@ data %>%
 Normalisation
 -------------
 
+We want to express our data as log2RPM (reads per million reads of library)
+
+```{r}
+data %>%
+  group_by(sample) %>%
+  mutate(
+    log2RPM = log2( (count+1) / (sum(count)/1000000) )
+  ) -> data
+
+head(data)
+```
+
+Plotting and Analysis
+=====================
+
+
 
 
 
